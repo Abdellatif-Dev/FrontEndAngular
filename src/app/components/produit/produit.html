@@ -1,0 +1,208 @@
+<div class="animate-fadeUp space-y-8">
+
+  <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div>
+      <h1 class="text-3xl font-black text-white tracking-tight">Gestion des Stocks</h1>
+      <p class="text-slate-500">
+        {{ showForm() ? (isEditing() ? 'Modification du produit' : 'Configuration du nouveau produit') : 'Contrôlez vos produits et inventaires' }}
+      </p>
+    </div>
+
+    <button (click)="toggleForm()"
+      [class]="showForm() ? 'bg-slate-700 hover:bg-slate-600 text-white' : 'bg-amber-500 hover:bg-amber-400 text-slate-950'"
+      class="flex items-center justify-center gap-2 px-6 py-3 font-bold rounded-2xl transition-all shadow-lg active:scale-95">
+      <button class="material-icons">{{ showForm() ? 'Retour à la liste' : 'Ajouter un Produit' }}</button>
+
+    </button>
+  </div>
+
+  <div *ngIf="showForm()"
+    class="bg-slate-800/40 backdrop-blur-md border border-white/5 rounded-[2.5rem] p-8 shadow-2xl animate-in fade-in zoom-in duration-500">
+    <h2 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
+      <span class="material-icons text-amber-500">{{ isEditing() ? 'Modifier les détails' : 'Détails du nouveau produit'
+        }}</span>
+
+    </h2>
+    <form [formGroup]="productForm" (ngSubmit)="onSubmit()" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+      <div class="lg:col-span-1 space-y-4">
+        <label class="text-xs font-bold text-slate-500 uppercase ml-1">Image du produit</label>
+        <div
+          class="relative group h-72 bg-slate-950/50 border-2 border-dashed border-slate-700 rounded-3xl overflow-hidden flex flex-col items-center justify-center transition-all hover:border-amber-500/50">
+          <img *ngIf="imagePreview()" [src]="imagePreview()" class="w-full h-full object-cover">
+          <div [class.opacity-0]="imagePreview()"
+            class="flex flex-col items-center group-hover:opacity-100 transition-opacity absolute inset-0 bg-slate-900/60 justify-center cursor-pointer text-center p-4">
+            <span class="material-icons text-4xl text-amber-500 mb-2">cloud upload</span>
+          </div>
+          <input type="file" (change)="onFileChange($event)" class="absolute inset-0 opacity-0 cursor-pointer">
+        </div>
+      </div>
+
+      <div class="lg:col-span-2 space-y-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="space-y-2">
+            <label class="text-xs font-bold text-slate-500 uppercase">Désignation</label>
+            <input type="text" formControlName="name"
+              class="w-full bg-slate-950/50 border border-slate-700 rounded-2xl px-5 py-4 text-white outline-none focus:border-amber-500 transition-all">
+          </div>
+          <div class="space-y-2">
+            <label class="text-xs font-bold text-slate-500 uppercase">Catégorie</label>
+            <select formControlName="category"
+              class="w-full bg-slate-950/50 border border-slate-700 rounded-2xl px-5 py-4 text-white outline-none focus:border-amber-500 transition-all">
+              <option value="Électronique">Électronique</option>
+              <option value="Vêtements">Vêtements</option>
+              <option value="Accessoires">Accessoires</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="space-y-2">
+          <label class="text-xs font-bold text-slate-500 uppercase">Description</label>
+          <textarea formControlName="description" rows="3" placeholder="Parlez-nous un peu de ce produit..."
+            class="w-full bg-slate-950/50 border border-slate-700 rounded-2xl px-5 py-4 text-white outline-none focus:border-amber-500 transition-all resize-none"></textarea>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="space-y-2"><label class="text-xs font-bold text-slate-500 uppercase">Prix (DH)</label><input
+              type="number" formControlName="price"
+              class="w-full bg-slate-950/50 border border-slate-700 rounded-2xl px-5 py-4 text-white outline-none focus:border-amber-500 transition-all">
+          </div>
+          <div class="space-y-2"><label class="text-xs font-bold text-slate-500 uppercase">Stock</label><input
+              type="number" formControlName="stock"
+              class="w-full bg-slate-950/50 border border-slate-700 rounded-2xl px-5 py-4 text-white outline-none focus:border-amber-500 transition-all">
+          </div>
+        </div>
+        <button type="submit" [disabled]="productForm.invalid"
+          class="w-full bg-amber-500 text-slate-950 font-black py-5 rounded-2xl mt-2 transition-all shadow-xl shadow-amber-500/20">
+          {{ isEditing() ? 'Confirmer les modifications' : 'Ajouter au catalogue' }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div *ngIf="!showForm()"
+    class="bg-slate-800/40 border border-white/5 rounded-[2.5rem] overflow-hidden backdrop-blur-md shadow-2xl animate-in slide-in-from-bottom duration-500">
+    <div class="p-8 border-b border-white/5 flex justify-between items-center">
+      <h2 class="text-xl font-bold text-white uppercase tracking-wider">Catalogue Produits</h2>
+      <span class="text-slate-500 text-xs font-bold">{{ products().length }} Articles enregistrés</span>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="w-full text-left border-collapse">
+        <thead class="bg-slate-950/30 text-slate-500 text-[10px] uppercase tracking-[0.2em] font-black">
+          <tr>
+            <th class="p-6">Aperçu</th>
+            <th class="p-6">Nom</th>
+            <th class="p-6">Description</th> 
+            <th class="p-6">Catégorie</th>
+            <th class="p-6">Prix</th>
+            <th class="p-6">Stock</th>
+            <th class="p-6 text-center">Actions</th>
+          </tr>
+        </thead>
+
+        <tbody class="divide-y divide-white/5">
+
+          <ng-container *ngIf="loading()">
+            <tr *ngFor="let i of [1,2,3]" class="animate-pulse">
+              <td class="p-6">
+                <div class="w-14 h-14 bg-slate-700/50 rounded-2xl"></div>
+              </td>
+              <td class="p-6">
+                <div class="h-4 bg-slate-700/50 rounded w-24"></div>
+              </td>
+              <td class="p-6">
+                <div class="h-3 bg-slate-700/30 rounded w-40"></div>
+              </td>
+              <td class="p-6">
+                <div class="h-6 bg-slate-700/50 rounded-lg w-20"></div>
+              </td>
+              <td class="p-6">
+                <div class="h-4 bg-slate-700/50 rounded w-16"></div>
+              </td>
+              <td class="p-6">
+                <div class="h-4 bg-slate-700/50 rounded w-10"></div>
+              </td>
+              <td class="p-6">
+                <div class="flex justify-center gap-2">
+                  <div class="w-8 h-8 bg-slate-700/50 rounded-lg"></div>
+                  <div class="w-8 h-8 bg-slate-700/50 rounded-lg"></div>
+                </div>
+              </td>
+            </tr>
+          </ng-container>
+
+          <tr *ngIf="error() && !loading()">
+            <td colspan="7" class="p-20 text-center">
+              <div class="flex flex-col items-center">
+                <span class="material-icons text-red-500/50 text-5xl mb-4">wifi_off</span>
+                <p class="text-slate-400 mb-4">Erreur de connexion au serveur</p>
+                <button (click)="loadProducts()"
+                  class="bg-slate-700 hover:bg-slate-600 text-white px-6 py-2 rounded-xl text-sm transition-all flex items-center gap-2 mx-auto">
+                  <span class="material-icons text-sm">Réessayer</span>
+                </button>
+              </div>
+            </td>
+          </tr>
+
+          <ng-container *ngIf="!loading() && !error()">
+            <tr *ngFor="let p of products()" class="hover:bg-white/[0.02] transition-colors group">
+              <td class="p-6">
+                <img [src]="'http://localhost:8082' + p.imageUrl"
+                  class="w-14 h-14 rounded-2xl object-cover bg-slate-900 border border-white/5 shadow-md">
+              </td>
+              <td class="p-6">
+                <div class="font-bold text-white group-hover:text-amber-500 transition-colors">{{ p.name }}</div>
+                <div class="text-[10px] text-slate-500 mt-1 uppercase">ID: #{{ p.id }}</div>
+              </td>
+
+              <td class="p-6 max-w-[200px]">
+                <p class="text-slate-400 text-xs leading-relaxed line-clamp-2 italic">
+                  {{ p.description || 'Aucune description' }}
+                </p>
+              </td>
+
+              <td class="p-6">
+                <span
+                  class="text-slate-400 text-xs font-medium bg-slate-900/50 px-3 py-1 rounded-lg border border-white/5">{{
+                  p.category }}</span>
+              </td>
+              <td class="p-6 font-black text-amber-500">{{ p.price | number:'1.2-2' }} <span
+                  class="text-[10px]">DH</span></td>
+              <td class="p-6">
+                <div class="flex flex-col gap-1">
+                  <span [class]="p.stock > 5 ? 'text-emerald-400' : 'text-red-400'" class="font-bold text-sm">{{ p.stock
+                    }}</span>
+                  <div class="w-16 h-1 bg-slate-700 rounded-full overflow-hidden">
+                    <div class="h-full" [class]="p.stock > 5 ? 'bg-emerald-500' : 'bg-red-500'"
+                      [style.width.%]="p.stock > 100 ? 100 : p.stock"></div>
+                  </div>
+                </div>
+              </td>
+              <td class="p-6">
+                <div class="flex justify-center gap-3">
+                  <button (click)="editProduct(p)"
+                    class="px-5  py-2 flex items-center justify-center rounded-xl bg-slate-700 hover:bg-amber-500 text-white hover:text-slate-950 transition-all shadow-lg active:scale-90">
+                    <span class="material-icons text-sm">edit</span>
+                  </button>
+                  <button (click)="deleteProduct(p.id)"
+                    class="px-5  py-2 flex items-center justify-center rounded-xl bg-slate-700 hover:bg-red-500 text-white transition-all shadow-lg active:scale-90">
+                    <span class="material-icons text-sm">delete</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+
+            <tr *ngIf="products().length === 0">
+              <td colspan="7" class="p-20 text-center text-slate-500 uppercase text-xs tracking-widest font-bold">
+                Aucun produit disponible
+              </td>
+            </tr>
+          </ng-container>
+
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>

@@ -1,0 +1,46 @@
+<div class="min-h-screen bg-[#0f172a] flex text-slate-200">
+
+    <aside class="w-64 bg-slate-900/50 backdrop-blur-xl border-r border-white/5 fixed h-full z-40 flex flex-col">
+
+        <div class="p-6 flex items-center gap-3 border-b border-white/5">
+            <div class="w-8 h-8 bg-amber-500 rounded-lg flex items-center justify-center shadow-lg shadow-amber-500/20">
+                <span class="text-slate-900 font-black text-xl">⬡</span>
+            </div>
+            <span class="font-bold text-xl tracking-tighter text-white uppercase">
+                {{ auth.isAdmin() ? 'Admin Panel' : 'User Space' }}
+            </span>
+        </div>
+
+        <nav class="flex-1 p-4 space-y-3 mt-4">
+
+            <a [routerLink]="auth.isAdmin() ? '/admin/dashboard' : '/user/dashboard'"
+                routerLinkActive="bg-amber-500 text-slate-950 font-bold shadow-lg shadow-amber-500/20"
+                [routerLinkActiveOptions]="{exact: true}"
+                class="flex items-center gap-3 px-4 py-3.5 rounded-2xl text-slate-400 transition-all duration-300 group">
+                <span class="material-icons text-[20px]">dashboard</span>
+            </a>
+
+            <a *ngIf="auth.isAdmin()" routerLink="/admin/produits"
+                routerLinkActive="bg-amber-500 text-slate-950 font-bold shadow-lg shadow-amber-500/20"
+                class="flex items-center gap-3 px-4 py-3.5 rounded-2xl text-slate-400 transition-all duration-300 group">
+                <span class="material-icons text-[20px]">Gestion Produits</span>
+
+            </a>
+
+            <a [routerLink]="auth.isAdmin() ? '/admin/profil' : '/user/profil'"
+                routerLinkActive="bg-amber-500 text-slate-950 font-bold shadow-lg shadow-amber-500/20"
+                class="flex items-center gap-3 px-4 py-3.5 rounded-2xl text-slate-400 transition-all duration-300 group">
+                <span class="material-icons text-[20px]">Mon Profil</span>
+
+            </a>
+
+
+        </nav>
+    </aside>
+
+    <main class="flex-1 ml-64 p-8 min-h-screen bg-gradient-to-br from-[#0f172a] via-[#0f172a] to-[#1e293b]">
+        <div class="max-w-6xl mx-auto">
+            <router-outlet></router-outlet>
+        </div>
+    </main>
+</div>

@@ -1,0 +1,174 @@
+<div class="animate-fadeUp space-y-8 pb-10">
+
+    <!-- Header -->
+    <header class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+            <h1 class="text-3xl font-black text-white tracking-tight">Tableau de bord</h1>
+            <p class="text-slate-500 italic">Bienvenue, <span class="text-amber-500 font-bold">{{ auth.username()
+                    }}</span></p>
+        </div>
+        <button routerLink="/"
+            class="bg-white/5 hover:bg-white/10 text-white px-6 py-3 rounded-2xl font-bold border border-white/5 transition-all text-sm flex items-center gap-2">
+            <span class="material-icons text-sm">Continuer mes achats</span>
+
+        </button>
+    </header>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div
+            class="bg-slate-800/40 p-8 rounded-[2.5rem] border border-white/5 backdrop-blur-md relative overflow-hidden group shadow-2xl">
+            <div
+                class="absolute -right-4 -top-4 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl group-hover:bg-blue-500/20 transition-all">
+            </div>
+            <div class="flex items-center gap-4 mb-4">
+                <div class="p-4 bg-blue-500/10 rounded-2xl text-blue-500">
+                    <span class="material-icons">local_mall</span>
+                </div>
+                <span class="text-slate-400 text-xs font-black uppercase tracking-[0.2em]">Total Commandes</span>
+            </div>
+            <div class="text-5xl font-black text-white leading-none">{{ totalOrdersCount() }}</div>
+        </div>
+
+        <div
+            class="bg-slate-800/40 p-8 rounded-[2.5rem] border border-white/5 backdrop-blur-md relative overflow-hidden group shadow-2xl">
+            <div
+                class="absolute -right-4 -top-4 w-32 h-32 bg-amber-500/10 rounded-full blur-3xl group-hover:bg-amber-500/20 transition-all">
+            </div>
+            <div class="flex items-center gap-4 mb-4">
+                <div class="p-4 bg-amber-500/10 rounded-2xl text-amber-500">
+                    <span class="material-icons">savings</span>
+                </div>
+                <span class="text-slate-400 text-xs font-black uppercase tracking-[0.2em]">Dépenses Totales</span>
+            </div>
+            <div class="text-5xl font-black text-white leading-none">
+                {{ totalSpent() | number:'1.0-0' }} <span class="text-xl font-bold text-amber-500">DH</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-slate-800/40 border border-white/5 rounded-[2.5rem] overflow-hidden shadow-2xl backdrop-blur-md">
+        <div class="p-8 border-b border-white/5 flex justify-between items-center bg-white/[0.02]">
+            <h3 class="text-xl font-bold text-white uppercase tracking-wider">Mes 10 dernières commandes</h3>
+            <span class="text-slate-500 text-[10px] font-black uppercase tracking-widest">{{ recentOrders().length }}
+                affichées</span>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-left">
+                <thead class="bg-slate-950/40 text-slate-500 text-[10px] uppercase font-black tracking-[0.2em]">
+                    <tr>
+                        <th class="p-6">Réf. Commande</th>
+                        <th class="p-6">Date</th>
+                        <th class="p-6">Montant</th>
+                        <th class="p-6">État</th>
+                        <th class="p-6 text-center">Action</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-white/5 text-sm">
+                    <tr *ngFor="let o of recentOrders()" class="hover:bg-white/[0.02] transition-all group">
+                        <td class="p-6">
+                            <div class="text-white font-mono font-bold text-xs tracking-wider">#{{
+                                o.orderNumber.split('-')[2] }}</div>
+                            <div class="text-[9px] text-slate-600 mt-1 uppercase">ID: {{ o.id }}</div>
+                        </td>
+                        <td class="p-6 text-slate-400">
+                            {{ o.createdAt | date:'dd MMMM yyyy' }}
+                        </td>
+                        <td class="p-6">
+                            <div class="text-amber-500 font-black text-base">{{ o.totalAmount | number:'1.2-2' }} <span
+                                    class="text-[10px]">DH</span></div>
+                        </td>
+                        <td class="p-6">
+                            <span [class]="getStatusClass(o.status)"
+                                class="px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest border shadow-sm">
+                                {{ o.status }}
+                            </span>
+                        </td>
+                        <td class="p-6 text-center">
+                            <button (click)="viewOrder(o)"
+                                class="px-5 py-2 rounded-xl bg-slate-700 hover:bg-amber-500 text-white hover:text-slate-950 transition-all shadow-lg active:scale-90 inline-flex items-center justify-center">
+                                <span class="material-icons text-sm">visibility</span>
+                            </button>
+                        </td>
+                    </tr>
+                    <tr *ngIf="recentOrders().length === 0">
+                        <td colspan="5"
+                            class="p-20 text-center text-slate-500 uppercase text-xs font-black tracking-widest">
+                            Aucune commande effectuée pour le moment
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div *ngIf="showOrderModal()"
+        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-md animate-in fade-in duration-300">
+
+        <div (click)="$event.stopPropagation()"
+            class="bg-slate-900 border border-white/10 w-full max-w-2xl rounded-[3rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
+
+            <div class="p-8 border-b border-white/5 flex justify-between items-center bg-white/[0.02]">
+                <div>
+                    <h3 class="text-2xl font-black text-white uppercase tracking-tight">Ma Commande</h3>
+                    <div class="flex items-center gap-2 mt-1">
+                        <span class="text-amber-500 text-xs font-mono font-bold tracking-widest">#{{
+                            selectedOrder()?.orderNumber }}</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="p-8 max-h-[50vh] overflow-y-auto custom-scrollbar">
+                <div class="space-y-4">
+                    <div *ngFor="let item of selectedOrder()?.items"
+                        class="flex items-center gap-5 p-4 rounded-3xl bg-slate-800/50 border border-white/5 group">
+                        <div
+                            class="w-20 h-20 rounded-2xl bg-slate-950 flex-shrink-0 overflow-hidden border border-white/10 flex items-center justify-center shadow-2xl">
+                            <img *ngIf="getProductImage(item.productId)"
+                                [src]="'http://localhost:8082' + getProductImage(item.productId)"
+                                class="w-full h-full object-cover">
+                            <span *ngIf="!getProductImage(item.productId)"
+                                class="material-icons text-slate-700 text-3xl">inventory_2</span>
+                        </div>
+
+                        <div class="flex-1 min-w-0">
+                            <div class="text-white font-bold text-base truncate">{{ item.productName }}</div>
+                            <div class="text-slate-500 text-[10px] font-black uppercase mt-1">{{ item.productCategory }}
+                            </div>
+                            <div class="mt-2 text-white/40 text-xs font-bold">Quantité: {{ item.quantity }}</div>
+                        </div>
+
+                        <div class="text-right">
+                            <div class="text-amber-500 font-black text-lg">{{ item.subtotal | number:'1.2-2' }} <span
+                                    class="text-[10px]">DH</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-8 p-6 rounded-[2rem] bg-white/5 border border-white/5">
+                    <div class="flex items-center gap-2 mb-2 text-slate-500">
+                        <span class="material-icons text-sm">local_shipping</span>
+                        <span class="text-[10px] font-black uppercase tracking-widest">Adresse de livraison</span>
+                    </div>
+                    <p class="text-slate-300 text-sm font-medium leading-relaxed">{{ selectedOrder()?.shippingAddress }}
+                    </p>
+                </div>
+            </div>
+
+            <div class="p-8 border-t border-white/5 bg-slate-800/50 flex justify-between items-center">
+                <div>
+                    <span class="text-slate-500 text-[10px] font-black uppercase tracking-widest block mb-1">Montant
+                        Payé</span>
+                    <span class="text-3xl font-black text-white">{{ selectedOrder()?.totalAmount | number:'1.2-2' }}
+                        <span class="text-sm font-bold text-amber-500">DH</span></span>
+                </div>
+                <button (click)="closeModal()"
+                    class="px-10 py-4 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-2xl transition-all shadow-xl shadow-amber-500/20">
+                    Fermer
+                </button>
+            </div>
+        </div>
+    </div>
+
+</div>

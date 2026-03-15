@@ -1,0 +1,44 @@
+<div class="fixed inset-0 z-[60] flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4">
+  
+  <div class="relative w-full max-w-sm bg-[#111827] border border-white/10 rounded-[2rem] shadow-2xl overflow-hidden transition-all animate-in fade-in zoom-in duration-300">
+    
+    <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-amber-500 to-transparent opacity-50"></div>
+
+    <div class="p-8 md:p-10 flex flex-col items-center text-center">
+      
+      <div class="w-20 h-20 rounded-full bg-slate-800 flex items-center justify-center mb-6 border border-white/5 shadow-inner">
+        <svg class="w-10 h-10 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+        </svg>
+      </div>
+
+      <h2 class="text-2xl font-bold text-white mb-3 tracking-tight">
+        Connexion requise
+      </h2>
+      <p class="text-slate-400 text-sm leading-relaxed mb-8 font-medium">
+        Identifiez-vous pour débloquer toutes les fonctionnalités et finaliser vos achats.
+      </p>
+
+      <div class="w-full space-y-3">
+        
+        <a routerLink="/register" (click)="close()"
+           class="flex items-center justify-center w-full py-4 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl transition-all duration-300 shadow-lg shadow-amber-500/20 active:scale-95">
+           <span class="material-icons text-sm mr-2">Créer un compte</span>
+           
+        </a>
+
+        <a routerLink="/login" (click)="close()"
+           class="flex items-center justify-center w-full py-4 bg-slate-800/40 hover:bg-slate-800 text-white font-bold rounded-xl border border-white/5 transition-all active:scale-95">
+           <span class="material-icons text-sm mr-2">Se connecter</span>
+           
+        </a>
+
+        <button (click)="close()" 
+                class="pt-4 text-slate-500 hover:text-amber-500 text-xs font-bold uppercase tracking-[0.2em] transition-colors">
+          Plus tard
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
